@@ -1,584 +1,367 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark" data-lang="en">
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AURA ETHEREAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1A73E8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>IJK Smart Attendance Pro</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="assets/icon-192.png" />
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body id="dynamic-atmosphere">
 
-    <div id="atmosphere-visuals"></div>
-    <div id="lightning-container"></div>
-    <div id="fog-overlay"></div>
-    <div class="background-orbs"></div>
+<body>
 
-    <!-- Pull Refresh -->
-    <div id="pull-indicator">
-        <i data-lucide="refresh-cw" style="width:18px;height:18px;color:#2e9aff;"></i>
-        <span data-i18n="pull_refresh">Pull to Refresh</span>
+  <!-- GLOBAL LOADER -->
+  <div id="global-loader">
+    <div class="loader-rings">
+      <div class="loader-ring loader-ring-1"></div>
+      <div class="loader-ring loader-ring-2"></div>
+      <div class="loader-ring loader-ring-3"></div>
+      <div class="loader-logo-center">
+        <span class="logo-i">I</span><span class="logo-j">J</span><span class="logo-k">K</span>
+      </div>
+    </div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+    <p class="loader-text">Smart Attendance Pro</p>
+    <div class="loader-dots"><span></span><span></span><span></span></div>
+    <div class="loader-tagline">IJK COACHING CENTER</div>
+  </div>
+
+  <!-- APP SHELL -->
+  <div id="app" class="hidden">
+
+    <!-- TOP NAV BAR -->
+    <header id="top-nav" class="hidden">
+      <div class="nav-left">
+        <button id="btn-menu" aria-label="Menu">&#9776;</button>
+        <div class="nav-brand">
+          <span class="brand-ijk">IJK</span>
+          <span class="brand-sub">Attendance Pro</span>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button id="btn-dark-mode" title="Toggle Dark Mode" aria-label="Dark Mode">🌙</button>
+        <div id="user-avatar" title="Profile"></div>
+        <button id="btn-logout" class="btn-icon-red" title="Logout">⏻</button>
+      </div>
+    </header>
+
+    <!-- SIDE DRAWER -->
+    <aside id="side-drawer">
+      <div class="drawer-header">
+        <div id="drawer-user-info">
+          <div id="drawer-avatar"></div>
+          <div>
+            <div id="drawer-name">—</div>
+            <div id="drawer-role-badge">—</div>
+          </div>
+        </div>
+        <button id="btn-close-drawer">✕</button>
+      </div>
+      <nav id="drawer-nav"></nav>
+    </aside>
+    <div id="drawer-overlay"></div>
+
+    <!-- ANNOUNCEMENT TICKER -->
+    <div id="announcement-bar" class="hidden">
+      <span class="announce-label">📢 Notice</span>
+      <div class="announce-track"><span id="announce-text"></span></div>
     </div>
 
-    <!-- Soft Notification -->
-    <div id="notif-bar" class="notif-bar hidden">
-        <span id="notif-icon">ℹ️</span>
-        <span id="notif-text"></span>
-        <button onclick="closeNotif()">✕</button>
-    </div>
+    <!-- PAGE ROUTER -->
+    <main id="page-container">
 
-    <!-- Share snack -->
-    <div id="share-snack" class="share-snack hidden">✅ <span data-i18n="copied">Copied to clipboard!</span></div>
-
-    <main class="main-canvas">
-
-        <!-- Header -->
-        <header class="top-intelligence">
-            <span id="system-time">--:--:--</span>
-            <div class="header-right">
-                <!-- Language Switcher -->
-                <div class="lang-menu-wrap">
-                    <button class="hdr-btn lang-btn" id="lang-toggle-btn" onclick="toggleLangMenu()" title="Language">
-                        <span id="lang-flag">🌐</span>
-                    </button>
-                    <div class="lang-dropdown hidden" id="lang-dropdown">
-                        <div class="lang-option" onclick="setLanguage('en')">🇺🇸 English</div>
-                        <div class="lang-option" onclick="setLanguage('ur')">🇵🇰 اردو</div>
-                        <div class="lang-option" onclick="setLanguage('es')">🇪🇸 Español</div>
-                        <div class="lang-option" onclick="setLanguage('hi')">🇮🇳 हिंदी</div>
-                        <div class="lang-option" onclick="setLanguage('de')">🇩🇪 Deutsch</div>
-                    </div>
-                </div>
-                <!-- Theme Toggle -->
-                <button class="hdr-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle Theme">
-                    <i data-lucide="moon" id="theme-icon"></i>
-                </button>
-                <button class="hdr-btn" onclick="shareWeather()" title="Share">
-                    <i data-lucide="share-2"></i>
-                </button>
-                <button class="hdr-btn" id="bookmark-btn" onclick="toggleBookmark()" title="Bookmark">
-                    <i data-lucide="bookmark" id="bookmark-icon"></i>
-                </button>
-                <span id="day-night-tag" class="online-tag">Synced</span>
+      <!-- PAGE: LOGIN -->
+      <section id="page-login" class="page active">
+        <div class="login-bg"></div>
+        <div class="login-card">
+          <div class="login-logo">
+            <span>I</span><span>J</span><span>K</span>
+          </div>
+          <h1>Smart Attendance Pro</h1>
+          <p class="login-tagline">IJK Coaching Center – Secure Teacher Portal</p>
+          <form id="login-form" novalidate>
+            <div class="field-group">
+              <label for="login-email">Email Address</label>
+              <input type="email" id="login-email" placeholder="teacher@ijk.edu" autocomplete="username" required />
             </div>
-        </header>
-
-        <!-- Search -->
-        <section class="search-hub">
-            <div class="search-input-wrapper">
-                <button onclick="getUserLocation()" title="My Location">
-                    <i data-lucide="map-pin"></i>
-                </button>
-                <input type="text" id="citySearch" data-i18n-placeholder="search_city" placeholder="Search city..." autocomplete="off">
-                <div id="search-dropdown" class="dropdown-hidden"></div>
-                <button onclick="fetchWeather(document.getElementById('citySearch').value)">
-                    <i data-lucide="search"></i>
-                </button>
+            <div class="field-group">
+              <label for="login-password">Password</label>
+              <div class="password-wrap">
+                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+                <button type="button" class="toggle-pw" data-target="login-password">👁</button>
+              </div>
             </div>
-        </section>
+            <div id="login-error" class="form-error hidden"></div>
+            <button type="submit" class="btn-primary btn-full" id="btn-login">
+              <span class="btn-text">Login Securely</span>
+              <span class="btn-spinner hidden"></span>
+            </button>
+          </form>
+          <p class="login-footer">Forgot password? Contact your admin.</p>
+        </div>
+      </section>
 
-        <!-- Bookmarks -->
-        <div id="bookmarks-bar" class="bookmarks-bar"></div>
-
-        <!-- Unit Toggles -->
-        <div class="unit-toggle-row">
-            <button class="unit-btn active" id="btn-c" onclick="setUnit(true)">°C</button>
-            <button class="unit-btn" id="btn-f" onclick="setUnit(false)">°F</button>
-            <div class="unit-divider"></div>
-            <button class="unit-btn active" id="btn-kmh" onclick="setWindUnit('kmh')">km/h</button>
-            <button class="unit-btn" id="btn-mph" onclick="setWindUnit('mph')">mph</button>
+      <!-- PAGE: TEACHER DASHBOARD -->
+      <section id="page-teacher-dashboard" class="page">
+        <div class="page-header">
+          <h2 id="teacher-greeting">Good morning!</h2>
+          <p id="teacher-date-display" class="muted-text"></p>
         </div>
 
-        <!-- Loader -->
-        <div id="loader">
-            <div class="loader-ring"></div>
-            <span data-i18n="detecting">Detecting atmosphere...</span>
+        <div id="active-slot-banner" class="slot-banner hidden">
+          <span class="slot-icon">🕐</span>
+          <div>
+            <div class="slot-label">Current Slot</div>
+            <div id="active-slot-name" class="slot-name">—</div>
+            <div id="active-slot-time" class="slot-time">—</div>
+          </div>
+          <div id="slot-status-pill" class="slot-pill">Active</div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════
-             SECTION 1: CURRENT WEATHER
-        ═══════════════════════════════════════════════ -->
-        <section id="weather-content" class="hidden">
-
-            <!-- Section Folder Tab -->
-            <div class="folder-tab" onclick="toggleSection('sec-current')">
-                <span>🌤 <span data-i18n="sec_current">Current Weather</span></span>
-                <i data-lucide="chevron-down" class="fold-icon" id="fold-current"></i>
+        <div class="checkin-zone">
+          <button id="btn-checkin" class="mega-checkin" aria-label="Check In">
+            <div class="checkin-pulse"></div>
+            <div class="checkin-inner">
+              <span class="checkin-icon">✓</span>
+              <span class="checkin-label">TAP TO CHECK IN</span>
+              <span id="checkin-status-text" class="checkin-status">Ready</span>
             </div>
-            <div id="sec-current" class="folder-body">
+          </button>
+          <p id="checkin-hint" class="checkin-hint">GPS verification will run automatically.</p>
+        </div>
 
-                <!-- Advisory -->
-                <div id="advisory-banner" class="advisory-banner hidden">
-                    <span id="advisory-icon">🌐</span>
-                    <span id="advisory-text"></span>
-                </div>
+        <div class="card mt-4">
+          <div class="card-header">📋 Today's Record</div>
+          <div id="today-records" class="records-list">
+            <div class="empty-state">No check-ins yet today.</div>
+          </div>
+        </div>
 
-                <!-- Location + local time -->
-                <div class="location-box">
-                    <h1 id="cityName">---</h1>
-                    <p id="localDateTime" class="local-dt">---</p>
-                    <p id="currentDesc">---</p>
-                </div>
+        <button class="btn-secondary btn-full mt-2" id="btn-open-leave">
+          🏖 Apply for Leave
+        </button>
 
-                <!-- Main Temp -->
-                <div class="temperature-visual">
-                    <div id="main-icon-svg" class="main-icon-wrap"></div>
-                    <div class="temp-block">
-                        <div class="temp-read">
-                            <span id="currentTemp">--</span><span class="unit-lbl" id="unitLabel">°C</span>
-                        </div>
-                        <div id="urdu-summary" class="urdu-summary"></div>
-                    </div>
-                </div>
+        <div id="timetable-section" class="card mt-2 hidden">
+          <div class="card-header">📅 Timetable</div>
+          <img id="timetable-img" src="" alt="Timetable" class="timetable-img" />
+        </div>
+      </section>
 
-                <!-- Hi / Lo / Moon -->
-                <div class="hilo-strip">
-                    <div class="hilo-item">
-                        <span class="hilo-label" data-i18n="high">HIGH</span>
-                        <strong id="todayHigh">--</strong>
-                    </div>
-                    <div class="hilo-sep"></div>
-                    <div class="hilo-item">
-                        <span class="hilo-label" data-i18n="low">LOW</span>
-                        <strong id="todayLow">--</strong>
-                    </div>
-                    <div class="hilo-sep"></div>
-                    <div class="hilo-item">
-                        <span class="hilo-label" data-i18n="moon">MOON</span>
-                        <strong id="moonPhase">--</strong>
-                    </div>
-                </div>
+      <!-- PAGE: ADMIN DASHBOARD -->
+      <section id="page-admin-dashboard" class="page">
+        <div class="page-header">
+          <h2>Admin Command Center</h2>
+          <p class="muted-text" id="admin-date"></p>
+        </div>
 
-                <!-- Stats Row 1 -->
-                <div class="stats-matrix">
-                    <div class="matrix-card">
-                        <i data-lucide="droplets"></i>
-                        <p data-i18n="humidity">Humidity</p>
-                        <strong id="humidityVal">--</strong>
-                    </div>
-                    <div class="matrix-card">
-                        <i data-lucide="wind"></i>
-                        <p data-i18n="wind">Wind</p>
-                        <strong id="windVal">--</strong>
-                    </div>
-                    <div class="matrix-card">
-                        <i data-lucide="thermometer"></i>
-                        <p data-i18n="feels_like">Feels Like</p>
-                        <strong id="feelsVal">--</strong>
-                    </div>
-                </div>
+        <div class="card">
+          <div class="card-header">📊 Today's Snapshot</div>
+          <div id="analytics-summary" class="analytics-row">
+            <div class="stat-box green"><div class="stat-num" id="stat-present">—</div><div>Present</div></div>
+            <div class="stat-box red"><div class="stat-num" id="stat-absent">—</div><div>Absent</div></div>
+            <div class="stat-box amber"><div class="stat-num" id="stat-late">—</div><div>Late</div></div>
+            <div class="stat-box blue"><div class="stat-num" id="stat-leave">—</div><div>On Leave</div></div>
+          </div>
+          <canvas id="attendance-chart" height="180"></canvas>
+        </div>
 
-                <!-- Stats Row 2 -->
-                <div class="stats-matrix" style="margin-top:10px;padding-top:12px;">
-                    <div class="matrix-card">
-                        <i data-lucide="eye"></i>
-                        <p data-i18n="visibility">Visibility</p>
-                        <strong id="visibilityVal">--</strong>
-                    </div>
-                    <div class="matrix-card">
-                        <i data-lucide="gauge"></i>
-                        <p data-i18n="pressure">Pressure</p>
-                        <strong id="pressureVal">--</strong>
-                    </div>
-                    <div class="matrix-card">
-                        <i data-lucide="sun"></i>
-                        <p data-i18n="uv_index">UV Index</p>
-                        <strong id="uvVal">--</strong>
-                    </div>
-                </div>
+        <div class="quick-actions-grid mt-3">
+          <button class="qa-btn" data-page="page-manage-teachers"><span class="qa-icon">👥</span><span>Teachers</span></button>
+          <button class="qa-btn" data-page="page-manage-slots"><span class="qa-icon">⏰</span><span>Slots</span></button>
+          <button class="qa-btn" data-page="page-manage-locations"><span class="qa-icon">📍</span><span>Locations</span></button>
+          <button class="qa-btn" data-page="page-announcements"><span class="qa-icon">📢</span><span>Notices</span></button>
+          <button class="qa-btn" data-page="page-leave-requests"><span class="qa-icon">🏖</span><span>Leaves</span></button>
+          <button class="qa-btn" data-page="page-reports"><span class="qa-icon">📄</span><span>Reports</span></button>
+          <button class="qa-btn" data-page="page-upload-timetable"><span class="qa-icon">🖼</span><span>Timetable</span></button>
+          <button class="qa-btn" data-page="page-subadmin"><span class="qa-icon">🔑</span><span>Sub-Admins</span></button>
+        </div>
 
-                <!-- Stats Row 3 -->
-                <div class="stats-matrix" style="margin-top:10px;padding-top:12px;">
-                    <div class="matrix-card">
-                        <i data-lucide="droplet"></i>
-                        <p data-i18n="dew_point">Dew Point</p>
-                        <strong id="dewPointVal">--</strong>
-                    </div>
-                    <div class="matrix-card">
-                        <i data-lucide="cloud"></i>
-                        <p data-i18n="cloud_cover">Cloud Cover</p>
-                        <strong id="cloudVal">--</strong>
-                    </div>
-                    <div class="matrix-card">
-                        <i data-lucide="navigation"></i>
-                        <p data-i18n="wind_gust">Wind Gust</p>
-                        <strong id="gustVal">--</strong>
-                    </div>
-                </div>
+        <div class="card mt-3">
+          <div class="card-header">🔴 Live Feed Today</div>
+          <div id="live-feed" class="records-list">
+            <div class="empty-state">Loading…</div>
+          </div>
+        </div>
+      </section>
 
-                <!-- Gauges -->
-                <div class="gauges-row">
-                    <div class="gauge-box">
-                        <p class="gauge-label" data-i18n="humidity">Humidity</p>
-                        <div class="svg-gauge-wrap">
-                            <svg viewBox="0 0 100 60" class="arc-svg">
-                                <path d="M10,55 A45,45 0 0,1 90,55" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8" stroke-linecap="round"/>
-                                <path id="humidity-arc-path" d="M10,55 A45,45 0 0,1 90,55" fill="none" stroke="#2e9aff" stroke-width="8" stroke-linecap="round" stroke-dasharray="141.4" stroke-dashoffset="141.4" style="transition:stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)"/>
-                            </svg>
-                            <span class="gauge-center-val" id="humidity-arc-val">0%</span>
-                        </div>
-                    </div>
-                    <div class="gauge-box">
-                        <p class="gauge-label" data-i18n="heat_index">Heat Index</p>
-                        <div class="svg-gauge-wrap">
-                            <svg viewBox="0 0 100 60" class="arc-svg">
-                                <path d="M10,55 A45,45 0 0,1 90,55" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8" stroke-linecap="round"/>
-                                <path id="heat-arc-path" d="M10,55 A45,45 0 0,1 90,55" fill="none" stroke="#ff6b35" stroke-width="8" stroke-linecap="round" stroke-dasharray="141.4" stroke-dashoffset="141.4" style="transition:stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)"/>
-                            </svg>
-                            <span class="gauge-center-val" id="heat-arc-val">0°</span>
-                        </div>
-                    </div>
-                    <div class="gauge-box">
-                        <p class="gauge-label" data-i18n="rain_chance">Rain Chance</p>
-                        <div class="svg-gauge-wrap">
-                            <svg viewBox="0 0 100 60" class="arc-svg">
-                                <path d="M10,55 A45,45 0 0,1 90,55" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8" stroke-linecap="round"/>
-                                <path id="rain-arc-path" d="M10,55 A45,45 0 0,1 90,55" fill="none" stroke="#60a5fa" stroke-width="8" stroke-linecap="round" stroke-dasharray="141.4" stroke-dashoffset="141.4" style="transition:stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)"/>
-                            </svg>
-                            <span class="gauge-center-val" id="rain-arc-val">0%</span>
-                        </div>
-                    </div>
-                </div>
+      <!-- PAGE: MANAGE TEACHERS -->
+      <section id="page-manage-teachers" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>Teacher Management</h2>
+        </div>
+        <button class="btn-primary btn-full mb-3" id="btn-add-teacher">+ Add New Teacher</button>
+        <div id="teachers-list" class="list-container">Loading…</div>
+      </section>
 
-                <!-- UV Bar -->
-                <div class="uv-section">
-                    <p class="section-label" data-i18n="uv_index">UV Index</p>
-                    <div class="uv-track">
-                        <div id="uvFill" class="uv-fill"></div>
-                    </div>
-                    <div class="uv-labels">
-                        <span data-i18n="uv_low">Low</span><span data-i18n="uv_mod">Moderate</span><span data-i18n="uv_high">High</span><span data-i18n="uv_vhigh">Very High</span><span data-i18n="uv_ext">Extreme</span>
-                    </div>
-                    <span id="uvRiskText" class="uv-risk-text">---</span>
-                </div>
+      <!-- PAGE: MANAGE SLOTS -->
+      <section id="page-manage-slots" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>Time Slot Management</h2>
+        </div>
+        <button class="btn-primary btn-full mb-3" id="btn-add-slot">+ Add New Slot</button>
+        <div id="slots-list" class="list-container">Loading…</div>
+      </section>
 
-                <!-- Comfort Index -->
-                <div class="comfort-section">
-                    <p class="section-label" data-i18n="comfort_index">Comfort Index</p>
-                    <div class="comfort-track">
-                        <div id="comfort-fill" class="comfort-fill"></div>
-                        <div id="comfort-dot" class="comfort-dot"></div>
-                    </div>
-                    <div class="comfort-labels">
-                        <span data-i18n="c_harsh">Harsh</span><span data-i18n="c_poor">Poor</span><span data-i18n="c_fair">Fair</span><span data-i18n="c_good">Good</span><span data-i18n="c_ideal">Ideal</span>
-                    </div>
-                    <span id="comfort-text" class="comfort-val">---</span>
-                </div>
+      <!-- PAGE: MANAGE LOCATIONS -->
+      <section id="page-manage-locations" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>GPS Location Management</h2>
+        </div>
+        <button class="btn-primary btn-full mb-3" id="btn-add-location">+ Add New Location</button>
+        <div id="locations-list" class="list-container">Loading…</div>
+      </section>
 
-                <!-- Sunrise / Sunset -->
-                <div class="sun-panel">
-                    <div class="sun-time-row">
-                        <div class="sun-time-item">
-                            <i data-lucide="sunrise" style="color:#ffb347;width:18px;height:18px;"></i>
-                            <span id="sunriseVal">--:--</span>
-                            <p data-i18n="sunrise">Sunrise</p>
-                        </div>
-                        <div class="sun-arc-bar">
-                            <div class="sun-arc-track">
-                                <div id="sunArcFill" class="sun-arc-fill"></div>
-                                <div id="sunDot" class="sun-dot"></div>
-                            </div>
-                            <p class="daylight-label"><span data-i18n="daylight">Daylight</span>: <span id="daylightHrs">--</span></p>
-                        </div>
-                        <div class="sun-time-item">
-                            <i data-lucide="sunset" style="color:#ff6b35;width:18px;height:18px;"></i>
-                            <span id="sunsetVal">--:--</span>
-                            <p data-i18n="sunset">Sunset</p>
-                        </div>
-                    </div>
-                </div>
+      <!-- PAGE: ANNOUNCEMENTS -->
+      <section id="page-announcements" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>Announcement Board</h2>
+        </div>
+        <div class="card mb-3">
+          <textarea id="announcement-text" rows="3" placeholder="Type today's notice…" class="textarea-field"></textarea>
+          <button class="btn-primary btn-full mt-2" id="btn-post-announcement">📢 Post Announcement</button>
+        </div>
+        <div id="announcements-list" class="list-container"></div>
+      </section>
 
-                <!-- ★ NEW: Real Feel Thermometer -->
-                <div class="thermometer-wrap">
-                    <p class="section-label" data-i18n="real_feel">Real Feel Thermometer</p>
-                    <div class="thermo-visual">
-                        <div class="thermo-tube">
-                            <div id="thermo-fill" class="thermo-fill"></div>
-                        </div>
-                        <div class="thermo-labels">
-                            <span>-10°</span><span>0°</span><span>15°</span><span>30°</span><span>45°</span>
-                        </div>
-                    </div>
-                    <span id="thermo-text" class="thermo-text">---</span>
-                </div>
+      <!-- PAGE: LEAVE REQUESTS -->
+      <section id="page-leave-requests" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>Leave Requests</h2>
+        </div>
+        <div id="leave-requests-list" class="list-container">Loading…</div>
+      </section>
 
-                <!-- ★ NEW: Weather Mood Ring -->
-                <div class="mood-ring-wrap">
-                    <p class="section-label" data-i18n="weather_mood">Weather Mood</p>
-                    <div id="mood-ring" class="mood-ring">
-                        <div class="mood-inner">
-                            <span id="mood-emoji" class="mood-emoji">🌤</span>
-                            <span id="mood-label" class="mood-label">---</span>
-                        </div>
-                    </div>
-                </div>
+      <!-- PAGE: REPORTS -->
+      <section id="page-reports" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>Attendance Reports</h2>
+        </div>
+        <div class="card">
+          <div class="field-group">
+            <label>Teacher</label>
+            <select id="report-teacher-select" class="select-field"></select>
+          </div>
+          <div class="field-group">
+            <label>Month</label>
+            <input type="month" id="report-month" class="input-field" />
+          </div>
+          <div class="btn-row mt-2">
+            <button class="btn-primary" id="btn-export-pdf">📄 Export PDF</button>
+            <button class="btn-secondary" id="btn-export-excel">📊 Export Excel</button>
+          </div>
+        </div>
+        <div id="report-preview" class="mt-3"></div>
+      </section>
 
-            </div><!-- /sec-current -->
+      <!-- PAGE: UPLOAD TIMETABLE -->
+      <section id="page-upload-timetable" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>Upload Timetable</h2>
+        </div>
+        <div class="card">
+          <label class="upload-label" for="timetable-upload">
+            <span class="upload-icon">🖼</span>
+            <span>Click or drag to upload timetable image</span>
+            <input type="file" id="timetable-upload" accept="image/*" class="hidden" />
+          </label>
+          <div id="upload-preview" class="upload-preview hidden">
+            <img id="upload-preview-img" src="" alt="Preview" />
+            <button class="btn-primary mt-2" id="btn-save-timetable">💾 Save Timetable</button>
+          </div>
+          <div id="upload-progress" class="progress-bar hidden"><div class="progress-fill"></div></div>
+        </div>
+      </section>
 
-        </section>
-
-        <!-- ═══════════════════════════════════════════════
-             SECTION 2: WIND & AIR QUALITY
-        ═══════════════════════════════════════════════ -->
-        <section id="wind-air-section" class="hidden">
-            <div class="folder-tab" onclick="toggleSection('sec-wind')">
-                <span>💨 <span data-i18n="sec_wind">Wind & Air Quality</span></span>
-                <i data-lucide="chevron-down" class="fold-icon" id="fold-wind"></i>
-            </div>
-            <div id="sec-wind" class="folder-body">
-
-                <!-- Compass + AQI -->
-                <div class="compass-aqi-row">
-                    <div class="compass-wrap">
-                        <div class="compass-ring">
-                            <span class="compass-dir n">N</span>
-                            <span class="compass-dir s">S</span>
-                            <span class="compass-dir e">E</span>
-                            <span class="compass-dir w">W</span>
-                            <div id="compassNeedle" class="compass-needle"></div>
-                            <div class="compass-center-dot"></div>
-                        </div>
-                        <p class="compass-label"><span id="windDirLabel">--</span> · <span id="windSpeedLabel">--</span></p>
-                    </div>
-                    <div class="aqi-card">
-                        <p class="aqi-label" data-i18n="air_quality">Air Quality (Est.)</p>
-                        <div class="aqi-score" id="aqi-score">--</div>
-                        <div class="aqi-bar-track">
-                            <div id="aqi-bar-fill" class="aqi-bar-fill"></div>
-                        </div>
-                        <span id="aqi-text" class="aqi-status-text">---</span>
-                    </div>
-                </div>
-
-                <!-- ★ NEW: Wind Speed Meter (animated bars) -->
-                <div class="wind-meter-wrap">
-                    <p class="section-label" data-i18n="wind_meter">Wind Speed Meter</p>
-                    <div class="wind-bars" id="wind-bars"></div>
-                    <div class="wind-beaufort">
-                        <span data-i18n="beaufort">Beaufort Scale: </span><strong id="beaufort-val">--</strong>
-                    </div>
-                </div>
-
-                <!-- ★ NEW: Air Breathability Score -->
-                <div class="breathe-card">
-                    <p class="section-label" data-i18n="breathe">Air Breathability</p>
-                    <div class="breathe-visual">
-                        <div class="breathe-ring" id="breathe-ring">
-                            <svg viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
-                                <circle id="breathe-circle" cx="50" cy="50" r="40" fill="none" stroke="#00e676" stroke-width="8"
-                                    stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"
-                                    transform="rotate(-90 50 50)"
-                                    style="transition:stroke-dashoffset 1.5s cubic-bezier(0.22,1,0.36,1)"/>
-                            </svg>
-                            <span id="breathe-pct" class="breathe-pct">--</span>
-                        </div>
-                        <div class="breathe-info">
-                            <strong id="breathe-label" class="breathe-label">---</strong>
-                            <p id="breathe-desc" class="breathe-desc">---</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════════════
-             SECTION 3: HOURLY & FORECAST
-        ═══════════════════════════════════════════════ -->
-        <section id="forecast-section" class="hidden">
-            <div class="folder-tab" onclick="toggleSection('sec-forecast')">
-                <span>📅 <span data-i18n="sec_forecast">Hourly & 7-Day Forecast</span></span>
-                <i data-lucide="chevron-down" class="fold-icon" id="fold-forecast"></i>
-            </div>
-            <div id="sec-forecast" class="folder-body">
-
-                <!-- Hourly toggle -->
-                <div class="hourly-header">
-                    <p class="section-label" style="margin-bottom:0" data-i18n="hourly_forecast">24-Hour Forecast</p>
-                    <div class="toggle-pill">
-                        <button id="pill-temp" class="pill-btn active" onclick="switchHourly('temp')">🌡 <span data-i18n="temp">Temp</span></button>
-                        <button id="pill-rain" class="pill-btn" onclick="switchHourly('rain')">💧 <span data-i18n="rain">Rain</span></button>
-                    </div>
-                </div>
-                <div id="hourlyGrid" class="horizontal-timeline"></div>
-
-                <!-- 7-day chart -->
-                <div class="chart-header">
-                    <p class="section-label" style="margin-bottom:0" data-i18n="weekly_trend">7-Day Trend</p>
-                    <span id="chart-hint" class="chart-hint" data-i18n="tap_day">tap a day →</span>
-                </div>
-                <div class="graph-container">
-                    <canvas id="tempChart"></canvas>
-                </div>
-                <div id="day-detail" class="day-detail hidden"></div>
-
-                <!-- 7-Day Cards -->
-                <div class="timeline-panel">
-                    <h3 data-i18n="weekly_forecast">7-Day Forecast</h3>
-                    <div id="weeklyGrid" class="horizontal-timeline"></div>
-                </div>
-
-                <!-- Rain Bars -->
-                <div id="rain-chart-wrap" class="rain-chart-wrap hidden">
-                    <p class="section-label" data-i18n="hourly_rain">Hourly Rainfall (mm)</p>
-                    <div id="rain-bars" class="rain-bars"></div>
-                </div>
-
-                <!-- ★ NEW: Precipitation Timeline -->
-                <div id="precip-timeline-wrap" class="precip-timeline-wrap hidden">
-                    <p class="section-label" data-i18n="precip_timeline">7-Day Precipitation</p>
-                    <div id="precip-timeline" class="precip-timeline"></div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════════════
-             SECTION 4: MAP
-        ═══════════════════════════════════════════════ -->
-        <section id="map-section-wrap" class="hidden">
-            <div class="folder-tab" onclick="toggleSection('sec-map')">
-                <span>🗺 <span data-i18n="sec_map">Live Weather Map</span></span>
-                <i data-lucide="chevron-down" class="fold-icon" id="fold-map"></i>
-            </div>
-            <div id="sec-map" class="folder-body">
-                <div class="map-section">
-                    <div class="map-top-row">
-                        <h3 class="section-label" style="margin-bottom:0;" data-i18n="live_map">Live Map</h3>
-                        <div class="map-layer-pills">
-                            <button class="ml-btn active" onclick="switchMapLayer('wind',this)">💨 <span data-i18n="wind">Wind</span></button>
-                            <button class="ml-btn" onclick="switchMapLayer('rain',this)">🌧 <span data-i18n="rain">Rain</span></button>
-                            <button class="ml-btn" onclick="switchMapLayer('temp',this)">🌡 <span data-i18n="temp">Temp</span></button>
-                            <button class="ml-btn" onclick="switchMapLayer('clouds',this)">☁️ <span data-i18n="cloud">Cloud</span></button>
-                        </div>
-                    </div>
-                    <div class="map-wrap">
-                        <iframe id="windyMap" class="windy-iframe" src="about:blank" frameborder="0" allowfullscreen loading="lazy"></iframe>
-                        <div class="map-loading" id="map-loading">
-                            <i data-lucide="map" style="width:22px;height:22px;color:#2e9aff;"></i>
-                            <span data-i18n="loading_map">Loading map...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════════════
-             SECTION 5: COMPARE CITIES
-        ═══════════════════════════════════════════════ -->
-        <section id="compare-section-wrap" class="hidden">
-            <div class="folder-tab" onclick="toggleSection('sec-compare')">
-                <span>⚡ <span data-i18n="sec_compare">Compare Cities</span></span>
-                <i data-lucide="chevron-down" class="fold-icon" id="fold-compare"></i>
-            </div>
-            <div id="sec-compare" class="folder-body">
-                <div class="compare-section">
-                    <div class="compare-input-row">
-                        <input type="text" id="compareCity" data-i18n-placeholder="compare_placeholder" placeholder="Compare with city..." class="compare-input">
-                        <button class="compare-btn" onclick="compareCity()" data-i18n="go">Go</button>
-                    </div>
-                    <div id="compare-result" class="compare-result hidden"></div>
-                </div>
-
-                <!-- ★ NEW: Multi-City Weather Ticker -->
-                <div class="city-ticker-wrap">
-                    <p class="section-label" data-i18n="world_cities">World Cities Live</p>
-                    <div id="city-ticker" class="city-ticker">
-                        <div class="ticker-loading">
-                            <div class="loader-ring" style="width:20px;height:20px;border-width:1.5px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════════════
-             SECTION 6: SMART FEATURES
-        ═══════════════════════════════════════════════ -->
-        <section id="smart-section-wrap" class="hidden">
-            <div class="folder-tab" onclick="toggleSection('sec-smart')">
-                <span>✨ <span data-i18n="sec_smart">Smart Features</span></span>
-                <i data-lucide="chevron-down" class="fold-icon" id="fold-smart"></i>
-            </div>
-            <div id="sec-smart" class="folder-body">
-
-                <!-- Trivia card -->
-                <div id="trivia-card" class="trivia-card hidden" onclick="nextTrivia()">
-                    <div class="trivia-inner">
-                        <span class="trivia-badge">⚡ <span data-i18n="did_you_know">Did You Know?</span></span>
-                        <p id="trivia-text">---</p>
-                        <span class="trivia-tap" data-i18n="tap_next">Tap for next fact →</span>
-                    </div>
-                </div>
-
-                <!-- Packing -->
-                <div id="packing-card" class="packing-card hidden">
-                    <p class="section-label" style="text-align:left;margin-bottom:8px;" data-i18n="what_to_carry">🎒 What to Carry</p>
-                    <div id="packing-items" class="packing-items"></div>
-                </div>
-
-                <!-- Weather Score -->
-                <div id="score-card" class="score-card hidden">
-                    <div class="score-left">
-                        <p class="score-label" data-i18n="weather_score">Today's Weather Score</p>
-                        <div class="score-number" id="score-number">--</div>
-                        <p id="score-verdict" class="score-verdict">---</p>
-                    </div>
-                    <div class="score-rings">
-                        <svg viewBox="0 0 80 80" class="score-svg">
-                            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
-                            <circle id="score-ring" cx="40" cy="40" r="32" fill="none" stroke="#2e9aff" stroke-width="6"
-                                stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"
-                                transform="rotate(-90 40 40)"
-                                style="transition:stroke-dashoffset 1.5s cubic-bezier(0.22,1,0.36,1)"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Countdown -->
-                <div id="countdown-card" class="countdown-card">
-                    <div id="countdown-content"></div>
-                </div>
-
-                <!-- ★ NEW: Activity Recommender -->
-                <div id="activity-card" class="activity-card hidden">
-                    <p class="section-label" data-i18n="best_activities">Best Activities Today</p>
-                    <div id="activity-list" class="activity-list"></div>
-                </div>
-
-                <!-- ★ NEW: Weather Alert History -->
-                <div id="alert-history-card" class="alert-history-card hidden">
-                    <p class="section-label" data-i18n="alert_history">Recent Alerts</p>
-                    <div id="alert-history-list" class="alert-history-list"></div>
-                </div>
-
-                <!-- ★ NEW: Crop / Outdoor Planner -->
-                <div id="planner-card" class="planner-card hidden">
-                    <p class="section-label" data-i18n="outdoor_planner">🌱 Outdoor Planner</p>
-                    <div class="planner-grid" id="planner-grid"></div>
-                </div>
-
-                <!-- ★ NEW: Feel vs Real chart -->
-                <div id="feel-real-card" class="feel-real-card hidden">
-                    <p class="section-label" data-i18n="feel_vs_real">Feels Like vs Actual (7-Day)</p>
-                    <canvas id="feelRealChart" height="80"></canvas>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="app-footer">
-            <span>AURA ETHEREAL v6</span>
-            <span id="last-updated">---</span>
-            <span>WeatherAPI</span>
-        </footer>
+      <!-- PAGE: SUB-ADMIN MANAGEMENT -->
+      <section id="page-subadmin" class="page">
+        <div class="page-header with-back">
+          <button class="btn-back" data-back="page-admin-dashboard">← Back</button>
+          <h2>Sub-Admin Management</h2>
+        </div>
+        <button class="btn-primary btn-full mb-3" id="btn-add-subadmin">+ Create Sub-Admin</button>
+        <div id="subadmin-list" class="list-container">Loading…</div>
+      </section>
 
     </main>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- GLOBAL MODALS -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal-box">
+      <div id="modal-header">
+        <h3 id="modal-title">—</h3>
+        <button id="modal-close">✕</button>
+      </div>
+      <div id="modal-body"></div>
+      <div id="modal-footer">
+        <button class="btn-secondary" id="modal-cancel">Cancel</button>
+        <button class="btn-primary"   id="modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Leave Modal -->
+  <div id="leave-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Apply for Leave</h3>
+        <button class="modal-close" data-close="leave-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <label>Leave Date</label>
+          <input type="date" id="leave-date" class="input-field" />
+        </div>
+        <div class="field-group">
+          <label>Reason</label>
+          <textarea id="leave-reason" rows="3" class="textarea-field" placeholder="Briefly explain…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" data-close="leave-modal">Cancel</button>
+        <button class="btn-primary" id="btn-submit-leave">Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCAL LIBRARIES -->
+  <script src="lib/chart.js"></script>
+
+  <!-- App -->
+  <script type="module" src="app.js"></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.warn('SW failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
