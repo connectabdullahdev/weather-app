@@ -508,6 +508,7 @@ body.rtl-mode .urdu-summary{direction:rtl;}
 
 /* ── Graph ── */
 .graph-container{height:90px;width:100%;margin-top:8px;cursor:pointer;overflow:hidden;position:relative;}
+.graph-container canvas{position:absolute;top:0;left:0;width:100%!important;height:100%!important;}
 
 /* ── Section label ── */
 .section-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:2px;text-align:center;margin-bottom:10px;}
